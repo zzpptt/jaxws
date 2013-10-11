@@ -41,6 +41,7 @@ import com.sun.xml.internal.ws.developer.StreamingDataHandler;
 import com.sun.xml.internal.ws.message.MimeAttachmentSet;
 import com.sun.xml.internal.ws.streaming.XMLStreamWriterUtil;
 import com.sun.xml.internal.ws.util.ByteArrayDataSource;
+import com.sun.xml.internal.ws.util.xml.NamespaceContextExAdaper;
 import com.sun.xml.internal.ws.util.xml.XMLStreamReaderFilter;
 import com.sun.xml.internal.ws.util.xml.XMLStreamWriterFilter;
 import com.sun.xml.internal.ws.streaming.MtomStreamWriter;
@@ -81,8 +82,8 @@ import java.util.UUID;
 public class MtomCodec extends MimeCodec {
 
     public static final String XOP_XML_MIME_TYPE = "application/xop+xml";
-    private static final String XOP_LOCALNAME = "Include";
-    private static final String XOP_NAMESPACEURI = "http://www.w3.org/2004/08/xop/include";
+    public static final String XOP_LOCALNAME = "Include";
+    public static final String XOP_NAMESPACEURI = "http://www.w3.org/2004/08/xop/include";
 
     private final StreamSOAPCodec codec;
     private final MTOMFeature mtomFeature;
@@ -171,8 +172,10 @@ public class MtomCodec extends MimeCodec {
                     bos.write(out);
                 }
 
-                //now write out the attachments in the message
-                writeAttachments(packet.getMessage().getAttachments(),out, boundary);
+                // now write out the attachments in the message that weren't
+                // previously written
+                writeNonMtomAttachments(packet.getMessage().getAttachments(),
+                        out, boundary);
 
                 //write out the end boundary
                 writeAsAscii("--"+boundary, out);
@@ -204,7 +207,13 @@ public class MtomCodec extends MimeCodec {
 
         ByteArrayBuffer(@NotNull DataHandler dh, String b) {
             this.dh = dh;
-            this.contentId = encodeCid();
+            String cid = null;
+            if (dh instanceof StreamingDataHandler) {
+                StreamingDataHandler sdh = (StreamingDataHandler) dh;
+                if (sdh.getHrefCid() != null)
+                    cid = sdh.getHrefCid();
+            }
+            this.contentId = cid != null ? cid : encodeCid();
             boundary = b;
         }
 
@@ -227,13 +236,27 @@ public class MtomCodec extends MimeCodec {
         writeln(out);
     }
 
-    private void writeAttachments(AttachmentSet attachments, OutputStream out, String boundary) throws IOException {
-        for(Attachment att : attachments){
-            //build attachment frame
-            writeln("--"+boundary, out);
+    // Compiler warning for not calling close, but cannot call close,
+    // will consume attachment bytes.
+        @SuppressWarnings("resource")
+    private void writeNonMtomAttachments(AttachmentSet attachments,
+            OutputStream out, String boundary) throws IOException {
+
+        for (Attachment att : attachments) {
+
+            DataHandler dh = att.asDataHandler();
+            if (dh instanceof StreamingDataHandler) {
+                StreamingDataHandler sdh = (StreamingDataHandler) dh;
+                // If DataHandler has href Content-ID, it is MTOM, so skip.
+                if (sdh.getHrefCid() != null)
+                    continue;
+            }
+
+            // build attachment frame
+            writeln("--" + boundary, out);
             writeMimeHeaders(att.getContentType(), att.getContentId(), out);
             att.writeTo(out);
-            writeln(out);                    // write \r\n
+            writeln(out); // write \r\n
         }
     }
 
@@ -352,8 +375,11 @@ public class MtomCodec extends MimeCodec {
         private void writeBinary(ByteArrayBuffer bab) {
             try {
                 mtomAttachments.add(bab);
-                writer.setPrefix("xop", XOP_NAMESPACEURI);
-                writer.writeNamespace("xop", XOP_NAMESPACEURI);
+                String prefix = writer.getPrefix(XOP_NAMESPACEURI);
+                if (prefix == null || !prefix.equals("xop")) {
+                    writer.setPrefix("xop", XOP_NAMESPACEURI);
+                    writer.writeNamespace("xop", XOP_NAMESPACEURI);
+                }
                 writer.writeStartElement(XOP_NAMESPACEURI, XOP_LOCALNAME);
                 writer.writeAttribute("href", "cid:"+bab.contentId);
                 writer.writeEndElement();
@@ -491,42 +517,12 @@ public class MtomCodec extends MimeCodec {
 
         @Override
         public NamespaceContextEx getNamespaceContext() {
-            NamespaceContext nsContext = reader.getNamespaceContext();
-            return new MtomNamespaceContextEx(nsContext);
+            return new NamespaceContextExAdaper(reader.getNamespaceContext());
         }
 
         @Override
         public String getElementTextTrim() throws XMLStreamException {
             throw new UnsupportedOperationException();
-        }
-
-        private static class MtomNamespaceContextEx implements NamespaceContextEx {
-            private final NamespaceContext nsContext;
-
-            public MtomNamespaceContextEx(NamespaceContext nsContext) {
-                this.nsContext = nsContext;
-            }
-
-            @Override
-            public Iterator<Binding> iterator() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public String getNamespaceURI(String prefix) {
-                return nsContext.getNamespaceURI(prefix);
-            }
-
-            @Override
-            public String getPrefix(String namespaceURI) {
-                return nsContext.getPrefix(namespaceURI);
-            }
-
-            @Override
-            public Iterator getPrefixes(String namespaceURI) {
-                return nsContext.getPrefixes(namespaceURI);
-            }
-
         }
 
         @Override
