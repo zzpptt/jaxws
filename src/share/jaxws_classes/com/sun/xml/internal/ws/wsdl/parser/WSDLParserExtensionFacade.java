@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,8 +27,10 @@ package com.sun.xml.internal.ws.wsdl.parser;
 
 import com.sun.xml.internal.ws.api.wsdl.parser.WSDLParserExtension;
 import com.sun.xml.internal.ws.api.wsdl.parser.WSDLParserExtensionContext;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.*;
+import com.sun.xml.internal.ws.api.model.wsdl.*;
 import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil;
+import com.sun.xml.internal.ws.model.wsdl.WSDLPortImpl;
+import com.sun.xml.internal.ws.model.wsdl.WSDLBoundPortTypeImpl;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.Location;
@@ -64,7 +66,7 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         }
     }
 
-    public boolean serviceElements(EditableWSDLService service, XMLStreamReader reader) {
+    public boolean serviceElements(WSDLService service, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if(e.serviceElements(service,reader))
                 return true;
@@ -73,12 +75,12 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void serviceAttributes(EditableWSDLService service, XMLStreamReader reader) {
+    public void serviceAttributes(WSDLService service, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions)
             e.serviceAttributes(service,reader);
     }
 
-    public boolean portElements(EditableWSDLPort port, XMLStreamReader reader) {
+    public boolean portElements(WSDLPort port, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if(e.portElements(port,reader))
                 return true;
@@ -86,34 +88,34 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         //extension is not understood by any WSDlParserExtension
         //Check if it must be understood.
         if(isRequiredExtension(reader)) {
-            port.addNotUnderstoodExtension(reader.getName(),getLocator(reader));
+            ((WSDLPortImpl)port).addNotUnderstoodExtension(reader.getName(),getLocator(reader));
         }
         XMLStreamReaderUtil.skipElement(reader);
         return true;
     }
 
-    public boolean portTypeOperationInput(EditableWSDLOperation op, XMLStreamReader reader) {
+    public boolean portTypeOperationInput(WSDLOperation op, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions)
             e.portTypeOperationInput(op,reader);
 
         return false;
     }
 
-    public boolean portTypeOperationOutput(EditableWSDLOperation op, XMLStreamReader reader) {
+    public boolean portTypeOperationOutput(WSDLOperation op, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions)
             e.portTypeOperationOutput(op,reader);
 
         return false;
     }
 
-    public boolean portTypeOperationFault(EditableWSDLOperation op, XMLStreamReader reader) {
+    public boolean portTypeOperationFault(WSDLOperation op, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions)
             e.portTypeOperationFault(op,reader);
 
         return false;
     }
 
-    public void portAttributes(EditableWSDLPort port, XMLStreamReader reader) {
+    public void portAttributes(WSDLPort port, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions)
             e.portAttributes(port,reader);
     }
@@ -128,7 +130,7 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public boolean bindingElements(EditableWSDLBoundPortType binding, XMLStreamReader reader){
+    public boolean bindingElements(WSDLBoundPortType binding, XMLStreamReader reader){
         for (WSDLParserExtension e : extensions) {
             if (e.bindingElements(binding, reader)) {
                 return true;
@@ -137,20 +139,20 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         //extension is not understood by any WSDlParserExtension
         //Check if it must be understood.
         if (isRequiredExtension(reader)) {
-            binding.addNotUnderstoodExtension(
+            ((WSDLBoundPortTypeImpl) binding).addNotUnderstoodExtension(
                     reader.getName(), getLocator(reader));
         }
         XMLStreamReaderUtil.skipElement(reader);
         return true;
     }
 
-    public void bindingAttributes(EditableWSDLBoundPortType binding, XMLStreamReader reader){
+    public void bindingAttributes(WSDLBoundPortType binding, XMLStreamReader reader){
         for (WSDLParserExtension e : extensions) {
             e.bindingAttributes(binding, reader);
         }
     }
 
-    public boolean portTypeElements(EditableWSDLPortType portType, XMLStreamReader reader) {
+    public boolean portTypeElements(WSDLPortType portType, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.portTypeElements(portType, reader)) {
                 return true;
@@ -160,13 +162,13 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void portTypeAttributes(EditableWSDLPortType portType, XMLStreamReader reader) {
+    public void portTypeAttributes(WSDLPortType portType, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.portTypeAttributes(portType, reader);
         }
     }
 
-    public boolean portTypeOperationElements(EditableWSDLOperation operation, XMLStreamReader reader) {
+    public boolean portTypeOperationElements(WSDLOperation operation, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.portTypeOperationElements(operation, reader)) {
                 return true;
@@ -176,13 +178,13 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void portTypeOperationAttributes(EditableWSDLOperation operation, XMLStreamReader reader) {
+    public void portTypeOperationAttributes(WSDLOperation operation, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.portTypeOperationAttributes(operation, reader);
         }
     }
 
-    public boolean bindingOperationElements(EditableWSDLBoundOperation operation, XMLStreamReader reader) {
+    public boolean bindingOperationElements(WSDLBoundOperation operation, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.bindingOperationElements(operation, reader)) {
                 return true;
@@ -192,13 +194,13 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void bindingOperationAttributes(EditableWSDLBoundOperation operation, XMLStreamReader reader) {
+    public void bindingOperationAttributes(WSDLBoundOperation operation, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.bindingOperationAttributes(operation, reader);
         }
     }
 
-    public boolean messageElements(EditableWSDLMessage msg, XMLStreamReader reader) {
+    public boolean messageElements(WSDLMessage msg, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.messageElements(msg, reader)) {
                 return true;
@@ -208,13 +210,13 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void messageAttributes(EditableWSDLMessage msg, XMLStreamReader reader) {
+    public void messageAttributes(WSDLMessage msg, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.messageAttributes(msg, reader);
         }
     }
 
-    public boolean portTypeOperationInputElements(EditableWSDLInput input, XMLStreamReader reader) {
+    public boolean portTypeOperationInputElements(WSDLInput input, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.portTypeOperationInputElements(input, reader)) {
                 return true;
@@ -224,13 +226,13 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void portTypeOperationInputAttributes(EditableWSDLInput input, XMLStreamReader reader) {
+    public void portTypeOperationInputAttributes(WSDLInput input, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.portTypeOperationInputAttributes(input, reader);
         }
     }
 
-    public boolean portTypeOperationOutputElements(EditableWSDLOutput output, XMLStreamReader reader) {
+    public boolean portTypeOperationOutputElements(WSDLOutput output, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.portTypeOperationOutputElements(output, reader)) {
                 return true;
@@ -240,13 +242,13 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void portTypeOperationOutputAttributes(EditableWSDLOutput output, XMLStreamReader reader) {
+    public void portTypeOperationOutputAttributes(WSDLOutput output, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.portTypeOperationOutputAttributes(output, reader);
         }
     }
 
-    public boolean portTypeOperationFaultElements(EditableWSDLFault fault, XMLStreamReader reader) {
+    public boolean portTypeOperationFaultElements(WSDLFault fault, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.portTypeOperationFaultElements(fault, reader)) {
                 return true;
@@ -256,13 +258,13 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void portTypeOperationFaultAttributes(EditableWSDLFault fault, XMLStreamReader reader) {
+    public void portTypeOperationFaultAttributes(WSDLFault fault, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.portTypeOperationFaultAttributes(fault, reader);
         }
     }
 
-    public boolean bindingOperationInputElements(EditableWSDLBoundOperation operation, XMLStreamReader reader) {
+    public boolean bindingOperationInputElements(WSDLBoundOperation operation, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.bindingOperationInputElements(operation, reader)) {
                 return true;
@@ -272,13 +274,13 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void bindingOperationInputAttributes(EditableWSDLBoundOperation operation, XMLStreamReader reader) {
+    public void bindingOperationInputAttributes(WSDLBoundOperation operation, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.bindingOperationInputAttributes(operation, reader);
         }
     }
 
-    public boolean bindingOperationOutputElements(EditableWSDLBoundOperation operation, XMLStreamReader reader) {
+    public boolean bindingOperationOutputElements(WSDLBoundOperation operation, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.bindingOperationOutputElements(operation, reader)) {
                 return true;
@@ -288,13 +290,13 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void bindingOperationOutputAttributes(EditableWSDLBoundOperation operation, XMLStreamReader reader) {
+    public void bindingOperationOutputAttributes(WSDLBoundOperation operation, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.bindingOperationOutputAttributes(operation, reader);
         }
     }
 
-    public boolean bindingOperationFaultElements(EditableWSDLBoundFault fault, XMLStreamReader reader) {
+    public boolean bindingOperationFaultElements(WSDLBoundFault fault, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             if (e.bindingOperationFaultElements(fault, reader)) {
                 return true;
@@ -304,7 +306,7 @@ final class WSDLParserExtensionFacade extends WSDLParserExtension {
         return true;
     }
 
-    public void bindingOperationFaultAttributes(EditableWSDLBoundFault fault, XMLStreamReader reader) {
+    public void bindingOperationFaultAttributes(WSDLBoundFault fault, XMLStreamReader reader) {
         for (WSDLParserExtension e : extensions) {
             e.bindingOperationFaultAttributes(fault, reader);
         }

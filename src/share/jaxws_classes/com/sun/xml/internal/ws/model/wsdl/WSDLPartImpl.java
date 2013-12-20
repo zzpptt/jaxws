@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,7 +28,6 @@ package com.sun.xml.internal.ws.model.wsdl;
 import com.sun.xml.internal.ws.api.model.ParameterBinding;
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLPart;
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLPartDescriptor;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLPart;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -37,7 +36,7 @@ import javax.xml.stream.XMLStreamReader;
  *
  * @author Vivek Pandey
  */
-public final class WSDLPartImpl extends AbstractObjectImpl implements EditableWSDLPart {
+public final class WSDLPartImpl extends AbstractObjectImpl implements WSDLPart {
     private final String name;
     private ParameterBinding binding;
     private int index;
@@ -71,6 +70,10 @@ public final class WSDLPartImpl extends AbstractObjectImpl implements EditableWS
     //need to set the index in case of rpclit to reorder the body parts
     public void setIndex(int index){
         this.index = index;
+    }
+
+    boolean isBody(){
+        return binding.isBody();
     }
 
     public WSDLPartDescriptor getDescriptor() {

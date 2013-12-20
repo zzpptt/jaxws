@@ -25,8 +25,7 @@
 
 package com.sun.xml.internal.ws.policy.jaxws;
 
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLObject;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.*;
+import com.sun.xml.internal.ws.api.model.wsdl.*;
 import com.sun.xml.internal.ws.api.wsdl.parser.WSDLParserExtension;
 import com.sun.xml.internal.ws.api.wsdl.parser.WSDLParserExtensionContext;
 import com.sun.xml.internal.ws.api.policy.PolicyResolver;
@@ -38,6 +37,7 @@ import com.sun.xml.internal.ws.policy.sourcemodel.PolicySourceModel;
 import com.sun.xml.internal.ws.policy.sourcemodel.PolicySourceModelContext;
 import com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.NamespaceVersion;
 import com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.XmlToken;
+import com.sun.xml.internal.ws.model.wsdl.WSDLModelImpl;
 import com.sun.xml.internal.ws.policy.PolicyException;
 import com.sun.xml.internal.ws.policy.PolicyMap;
 import com.sun.xml.internal.ws.util.xml.XmlUtil;
@@ -54,11 +54,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.ws.WebServiceException;
+import javax.xml.xpath.XPathFactoryConfigurationException;
 
 /**
  * This class parses the Policy Attachments in the WSDL and creates a PolicyMap thaty captures the policies configured on
@@ -375,7 +376,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public boolean portElements(final EditableWSDLPort port, final XMLStreamReader reader) {
+    public boolean portElements(final WSDLPort port, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(port, reader, getHandlers4PortMap());
         LOGGER.exiting();
@@ -383,14 +384,14 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void portAttributes(final EditableWSDLPort port, final XMLStreamReader reader) {
+    public void portAttributes(final WSDLPort port, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(port, reader, getHandlers4PortMap());
         LOGGER.exiting();
     }
 
     @Override
-    public boolean serviceElements(final EditableWSDLService service, final XMLStreamReader reader) {
+    public boolean serviceElements(final WSDLService service, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(service, reader, getHandlers4ServiceMap());
         LOGGER.exiting();
@@ -398,7 +399,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void serviceAttributes(final EditableWSDLService service, final XMLStreamReader reader) {
+    public void serviceAttributes(final WSDLService service, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(service, reader, getHandlers4ServiceMap());
         LOGGER.exiting();
@@ -423,7 +424,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public boolean bindingElements(final EditableWSDLBoundPortType binding, final XMLStreamReader reader) {
+    public boolean bindingElements(final WSDLBoundPortType binding, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(binding, reader, getHandlers4BindingMap());
         LOGGER.exiting();
@@ -431,14 +432,14 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void bindingAttributes(final EditableWSDLBoundPortType binding, final XMLStreamReader reader) {
+    public void bindingAttributes(final WSDLBoundPortType binding, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(binding, reader, getHandlers4BindingMap());
         LOGGER.exiting();
     }
 
     @Override
-    public boolean portTypeElements(final EditableWSDLPortType portType, final XMLStreamReader reader) {
+    public boolean portTypeElements(final WSDLPortType portType, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(portType, reader, getHandlers4PortTypeMap());
         LOGGER.exiting();
@@ -446,14 +447,14 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void portTypeAttributes(final EditableWSDLPortType portType, final XMLStreamReader reader) {
+    public void portTypeAttributes(final WSDLPortType portType, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(portType, reader, getHandlers4PortTypeMap());
         LOGGER.exiting();
     }
 
     @Override
-    public boolean portTypeOperationElements(final EditableWSDLOperation operation, final XMLStreamReader reader) {
+    public boolean portTypeOperationElements(final WSDLOperation operation, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(operation, reader, getHandlers4OperationMap());
         LOGGER.exiting();
@@ -461,14 +462,14 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void portTypeOperationAttributes(final EditableWSDLOperation operation, final XMLStreamReader reader) {
+    public void portTypeOperationAttributes(final WSDLOperation operation, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(operation, reader, getHandlers4OperationMap());
         LOGGER.exiting();
     }
 
     @Override
-    public boolean bindingOperationElements(final EditableWSDLBoundOperation boundOperation, final XMLStreamReader reader) {
+    public boolean bindingOperationElements(final WSDLBoundOperation boundOperation, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(boundOperation, reader, getHandlers4BoundOperationMap());
         LOGGER.exiting();
@@ -476,14 +477,14 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void bindingOperationAttributes(final EditableWSDLBoundOperation boundOperation, final XMLStreamReader reader) {
+    public void bindingOperationAttributes(final WSDLBoundOperation boundOperation, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(boundOperation, reader, getHandlers4BoundOperationMap());
         LOGGER.exiting();
     }
 
     @Override
-    public boolean messageElements(final EditableWSDLMessage msg, final XMLStreamReader reader) {
+    public boolean messageElements(final WSDLMessage msg, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(msg, reader, getHandlers4MessageMap());
         LOGGER.exiting();
@@ -491,14 +492,14 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void messageAttributes(final EditableWSDLMessage msg, final XMLStreamReader reader) {
+    public void messageAttributes(final WSDLMessage msg, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(msg, reader, getHandlers4MessageMap());
         LOGGER.exiting();
     }
 
     @Override
-    public boolean portTypeOperationInputElements(final EditableWSDLInput input, final XMLStreamReader reader) {
+    public boolean portTypeOperationInputElements(final WSDLInput input, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(input, reader, getHandlers4InputMap());
         LOGGER.exiting();
@@ -506,7 +507,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void portTypeOperationInputAttributes(final EditableWSDLInput input, final XMLStreamReader reader) {
+    public void portTypeOperationInputAttributes(final WSDLInput input, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(input, reader, getHandlers4InputMap());
         LOGGER.exiting();
@@ -514,7 +515,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
 
 
     @Override
-    public boolean portTypeOperationOutputElements(final EditableWSDLOutput output, final XMLStreamReader reader) {
+    public boolean portTypeOperationOutputElements(final WSDLOutput output, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(output, reader, getHandlers4OutputMap());
         LOGGER.exiting();
@@ -522,7 +523,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void portTypeOperationOutputAttributes(final EditableWSDLOutput output, final XMLStreamReader reader) {
+    public void portTypeOperationOutputAttributes(final WSDLOutput output, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(output, reader, getHandlers4OutputMap());
         LOGGER.exiting();
@@ -530,7 +531,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
 
 
     @Override
-    public boolean portTypeOperationFaultElements(final EditableWSDLFault fault, final XMLStreamReader reader) {
+    public boolean portTypeOperationFaultElements(final WSDLFault fault, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(fault, reader, getHandlers4FaultMap());
         LOGGER.exiting();
@@ -538,14 +539,14 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void portTypeOperationFaultAttributes(final EditableWSDLFault fault, final XMLStreamReader reader) {
+    public void portTypeOperationFaultAttributes(final WSDLFault fault, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(fault, reader, getHandlers4FaultMap());
         LOGGER.exiting();
     }
 
     @Override
-    public boolean bindingOperationInputElements(final EditableWSDLBoundOperation operation, final XMLStreamReader reader) {
+    public boolean bindingOperationInputElements(final WSDLBoundOperation operation, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(operation, reader, getHandlers4BindingInputOpMap());
         LOGGER.exiting();
@@ -553,7 +554,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void bindingOperationInputAttributes(final EditableWSDLBoundOperation operation, final XMLStreamReader reader) {
+    public void bindingOperationInputAttributes(final WSDLBoundOperation operation, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(operation, reader, getHandlers4BindingInputOpMap());
         LOGGER.exiting();
@@ -561,7 +562,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
 
 
     @Override
-    public boolean bindingOperationOutputElements(final EditableWSDLBoundOperation operation, final XMLStreamReader reader) {
+    public boolean bindingOperationOutputElements(final WSDLBoundOperation operation, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(operation, reader, getHandlers4BindingOutputOpMap());
         LOGGER.exiting();
@@ -569,14 +570,14 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void bindingOperationOutputAttributes(final EditableWSDLBoundOperation operation, final XMLStreamReader reader) {
+    public void bindingOperationOutputAttributes(final WSDLBoundOperation operation, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(operation, reader, getHandlers4BindingOutputOpMap());
         LOGGER.exiting();
     }
 
     @Override
-    public boolean bindingOperationFaultElements(final EditableWSDLBoundFault fault, final XMLStreamReader reader) {
+    public boolean bindingOperationFaultElements(final WSDLBoundFault fault, final XMLStreamReader reader) {
         LOGGER.entering();
         final boolean result = processSubelement(fault, reader, getHandlers4BindingFaultOpMap());
         LOGGER.exiting(result);
@@ -584,7 +585,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     }
 
     @Override
-    public void bindingOperationFaultAttributes(final EditableWSDLBoundFault fault, final XMLStreamReader reader) {
+    public void bindingOperationFaultAttributes(final WSDLBoundFault fault, final XMLStreamReader reader) {
         LOGGER.entering();
         processAttributes(fault, reader, getHandlers4BindingFaultOpMap());
         LOGGER.exiting();
@@ -700,7 +701,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
             // may otherwise be multiple entries for policies that are contained
             // by fault messages.
             HashSet<BuilderHandlerMessageScope> messageSet = new HashSet<BuilderHandlerMessageScope>();
-            for (EditableWSDLService service : context.getWSDLModel().getServices().values()) {
+            for (WSDLService service : context.getWSDLModel().getServices().values()) {
                 if (getHandlers4ServiceMap().containsKey(service)) {
                     getPolicyMapBuilder().registerHandler(new BuilderHandlerServiceScope(
                             getPolicyURIs(getHandlers4ServiceMap().get(service),modelContext)
@@ -710,7 +711,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
                 }
                 // end service scope
 
-                for (EditableWSDLPort port : service.getPorts()) {
+                for (WSDLPort port : service.getPorts()) {
                     if (getHandlers4PortMap().containsKey(port)) {
                         getPolicyMapBuilder().registerHandler(
                                 new BuilderHandlerEndpointScope(
@@ -746,9 +747,9 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
                         } // endif handler for port type
                         // end endpoint scope
 
-                        for (EditableWSDLBoundOperation boundOperation : port.getBinding().getBindingOperations()) {
+                        for (WSDLBoundOperation boundOperation : port.getBinding().getBindingOperations()) {
 
-                            final EditableWSDLOperation operation = boundOperation.getOperation();
+                            final WSDLOperation operation = boundOperation.getOperation();
                             final QName operationName = new QName(boundOperation.getBoundPortType().getName().getNamespaceURI(), boundOperation.getName().getLocalPart());
                             // We store the message and portType/operation under the same namespace as the binding/operation so that we can match them up later
                             if ( // handler for operation scope -- by boundOperation
@@ -777,9 +778,9 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
                             } // endif for portType:operation scope
                             // end operation scope
 
-                            final EditableWSDLInput input = operation.getInput();
+                            final WSDLInput input = operation.getInput();
                             if (null!=input) {
-                                EditableWSDLMessage inputMsg = input.getMessage();
+                                WSDLMessage inputMsg = input.getMessage();
                                 if (inputMsg != null && getHandlers4MessageMap().containsKey(inputMsg)) {
                                     messageSet.add(new BuilderHandlerMessageScope(
                                         getPolicyURIs(
@@ -824,9 +825,9 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
                             } // endif portType op input msg
                             // end input message scope
 
-                            final EditableWSDLOutput output = operation.getOutput();
+                            final WSDLOutput output = operation.getOutput();
                             if (null!=output) {
-                                EditableWSDLMessage outputMsg = output.getMessage();
+                                WSDLMessage outputMsg = output.getMessage();
                                 if (outputMsg != null && getHandlers4MessageMap().containsKey(outputMsg)) {
                                     messageSet.add(new BuilderHandlerMessageScope(
                                         getPolicyURIs(
@@ -871,8 +872,8 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
                             } // endif portType op output msg
                             // end output message scope
 
-                            for (EditableWSDLBoundFault boundFault : boundOperation.getFaults()) {
-                                final EditableWSDLFault fault = boundFault.getFault();
+                            for (WSDLBoundFault boundFault : boundOperation.getFaults()) {
+                                final WSDLFault fault = boundFault.getFault();
 
                                 // this shouldn't happen ususally,
                                 // but since this scenario tested in lagacy tests, dont' fail here
@@ -881,7 +882,7 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
                                     continue;
                                 }
 
-                                final EditableWSDLMessage faultMessage = fault.getMessage();
+                                final WSDLMessage faultMessage = fault.getMessage();
                                 final QName faultName = new QName(boundOperation.getBoundPortType().getName().getNamespaceURI(), boundFault.getName());
                                 // We store the message and portType/fault under the same namespace as the binding/fault so that we can match them up later
                                 if (faultMessage != null && getHandlers4MessageMap().containsKey(faultMessage)) {
@@ -947,14 +948,14 @@ final public class PolicyWSDLParserExtension extends WSDLParserExtension {
     @Override
     public void postFinished(final WSDLParserExtensionContext context) {
         // finally register the PolicyMap on the WSDLModel
-        EditableWSDLModel wsdlModel = context.getWSDLModel();
+        WSDLModel wsdlModel = context.getWSDLModel();
         PolicyMap effectiveMap;
         try {
             if(context.isClientSide())
                 effectiveMap = context.getPolicyResolver().resolve(new PolicyResolver.ClientContext(policyBuilder.getPolicyMap(),context.getContainer()));
             else
                 effectiveMap = context.getPolicyResolver().resolve(new PolicyResolver.ServerContext(policyBuilder.getPolicyMap(), context.getContainer(),null));
-            wsdlModel.setPolicyMap(effectiveMap);
+            ((WSDLModelImpl) wsdlModel).setPolicyMap(effectiveMap);
         } catch (PolicyException e) {
             LOGGER.logSevereException(e);
             throw LOGGER.logSevereException(new WebServiceException(PolicyMessages.WSP_1007_POLICY_EXCEPTION_WHILE_FINISHING_PARSING_WSDL(), e));

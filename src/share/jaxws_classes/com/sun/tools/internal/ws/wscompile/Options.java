@@ -87,13 +87,6 @@ public class Options {
 
     public String classpath = System.getProperty("java.class.path");
 
-    /**
-     * -javacOptions
-     *
-     * @since 2.2.9
-     */
-    public List<String> javacOptions;
-
 
     /**
      * -Xnocompile
@@ -101,13 +94,10 @@ public class Options {
     public boolean nocompile;
 
     /**
-     * If true XML security features when parsing XML documents will be disabled.
-     * The default value is false.
-     *
-     * Boolean
-     * @since 2.2.9
+     * Disable secure xml processing.
+     * -XdisableSecureXmlProcessing
      */
-    public boolean disableXmlSecurity;
+    public boolean disableSecureXmlProcessing = false;
 
     public enum Target {
         V2_0, V2_1, V2_2;
@@ -364,22 +354,11 @@ public class Options {
                 throw new BadCommandLineException(WscompileMessages.WSCOMPILE_UNSUPPORTED_ENCODING(encoding));
             }
             return 2;
-        } else if (args[i].equals("-disableXmlSecurity")) {
-            disableXmlSecurity();
-            return 1;
-        } else if (args[i].startsWith("-J")) {
-            if (javacOptions == null) {
-                javacOptions = new ArrayList<String>();
-            }
-            javacOptions.add(args[i].substring(2));
+        } else if (args[i].equals("-XdisableSecureXmlProcessing")) {
+            disableSecureXmlProcessing= true;
             return 1;
         }
         return 0;
-    }
-
-    // protected method to allow overriding
-    protected void disableXmlSecurity() {
-        disableXmlSecurity= true;
     }
 
     /**
@@ -393,28 +372,7 @@ public class Options {
         return args[i];
     }
 
-    List<String> getJavacOptions(List<String> existingOptions, WsimportListener listener) {
-        List<String> result = new ArrayList<String>();
-        for (String o: javacOptions) {
-            if (o.contains("=") && !o.startsWith("A")) {
-                int i = o.indexOf('=');
-                String key = o.substring(0, i);
-                if (existingOptions.contains(key)) {
-                    listener.message(WscompileMessages.WSCOMPILE_EXISTING_OPTION(key));
-                } else {
-                    result.add(key);
-                    result.add(o.substring(i + 1));
-                }
-            } else {
-                if (existingOptions.contains(o)) {
-                    listener.message(WscompileMessages.WSCOMPILE_EXISTING_OPTION(o));
-                } else {
-                    result.add(o);
-                }
-            }
-        }
-        return result;
-    }
+
 
     /**
      * Used to signal that we've finished processing.

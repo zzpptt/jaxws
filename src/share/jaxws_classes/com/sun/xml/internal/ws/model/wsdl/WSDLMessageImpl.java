@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,21 +25,19 @@
 
 package com.sun.xml.internal.ws.model.wsdl;
 
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLMessage;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLPart;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLMessage;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
-
 import java.util.ArrayList;
 
 /**
  * Provides abstraction for wsdl:message
  * @author Vivek Pandey
  */
-public final class WSDLMessageImpl extends AbstractExtensibleImpl implements EditableWSDLMessage {
+public final class WSDLMessageImpl extends AbstractExtensibleImpl implements WSDLMessage {
     private final QName name;
-    private final ArrayList<EditableWSDLPart> parts;
+    private final ArrayList<WSDLPartImpl> parts;
 
     /**
      * @param name wsdl:message name attribute value
@@ -47,18 +45,18 @@ public final class WSDLMessageImpl extends AbstractExtensibleImpl implements Edi
     public WSDLMessageImpl(XMLStreamReader xsr,QName name) {
         super(xsr);
         this.name = name;
-        this.parts = new ArrayList<EditableWSDLPart>();
+        this.parts = new ArrayList<WSDLPartImpl>();
     }
 
     public QName getName() {
         return name;
     }
 
-    public void add(EditableWSDLPart part){
+    public void add(WSDLPartImpl part){
         parts.add(part);
     }
 
-    public Iterable<EditableWSDLPart> parts(){
+    public Iterable<WSDLPartImpl> parts(){
         return parts;
     }
 }

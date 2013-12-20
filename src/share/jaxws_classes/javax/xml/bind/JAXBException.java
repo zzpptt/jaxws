@@ -48,7 +48,7 @@ public class JAXBException extends Exception {
      * Exception reference
      *
      */
-    private volatile Throwable linkedException;
+    private Throwable linkedException;
 
     static final long serialVersionUID = -5621384651494307979L;
 
@@ -133,7 +133,7 @@ public class JAXBException extends Exception {
      *                  indicates that the linked exception does not exist or
      *                  is unknown).
      */
-    public void setLinkedException( Throwable exception ) {
+    public synchronized void setLinkedException( Throwable exception ) {
         this.linkedException = exception;
     }
 

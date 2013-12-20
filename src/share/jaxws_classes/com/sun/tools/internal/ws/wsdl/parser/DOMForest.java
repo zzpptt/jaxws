@@ -114,7 +114,7 @@ public class DOMForest {
         this.logic = logic;
         try {
             // secure xml processing can be switched off if input requires it
-            boolean secureProcessingEnabled = options == null || !options.disableXmlSecurity;
+            boolean secureProcessingEnabled = options == null || !options.disableSecureXmlProcessing;
             DocumentBuilderFactory dbf = XmlUtil.newDocumentBuilderFactory(secureProcessingEnabled);
             dbf.setNamespaceAware(true);
             this.documentBuilder = dbf.newDocumentBuilder();
@@ -365,7 +365,7 @@ public class DOMForest {
         try {
             // create identity transformer
             // secure xml processing can be switched off if input requires it
-            boolean secureProcessingEnabled = options == null || !options.disableXmlSecurity;
+            boolean secureProcessingEnabled = options == null || !options.disableSecureXmlProcessing;
             TransformerFactory tf = XmlUtil.newTransformerFactory(secureProcessingEnabled);
             Transformer it = tf.newTransformer();
 

@@ -36,9 +36,7 @@ import com.sun.xml.internal.ws.api.databinding.DatabindingFactory;
 import com.sun.xml.internal.ws.api.databinding.MetadataReader;
 import com.sun.xml.internal.ws.api.databinding.WSDLGenInfo;
 import com.sun.xml.internal.ws.api.model.SEIModel;
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLModel;
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLPort;
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLService;
 import com.sun.xml.internal.ws.api.policy.PolicyResolver;
 import com.sun.xml.internal.ws.api.policy.PolicyResolverFactory;
 import com.sun.xml.internal.ws.api.server.AsyncProvider;
@@ -61,6 +59,9 @@ import com.sun.xml.internal.ws.model.AbstractSEIModelImpl;
 import com.sun.xml.internal.ws.model.ReflectAnnotationReader;
 import com.sun.xml.internal.ws.model.RuntimeModeler;
 import com.sun.xml.internal.ws.model.SOAPSEIModel;
+import com.sun.xml.internal.ws.model.wsdl.WSDLModelImpl;
+import com.sun.xml.internal.ws.model.wsdl.WSDLPortImpl;
+import com.sun.xml.internal.ws.model.wsdl.WSDLServiceImpl;
 import com.sun.xml.internal.ws.policy.PolicyMap;
 import com.sun.xml.internal.ws.policy.jaxws.PolicyUtil;
 import com.sun.xml.internal.ws.resources.ServerMessages;
@@ -72,7 +73,6 @@ import com.sun.xml.internal.ws.util.ServiceConfigurationError;
 import com.sun.xml.internal.ws.util.ServiceFinder;
 import com.sun.xml.internal.ws.util.xml.XmlUtil;
 import com.sun.xml.internal.ws.wsdl.parser.RuntimeWSDLParser;
-
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -86,7 +86,6 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.soap.SOAPBinding;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -233,7 +232,7 @@ public class EndpointFactory {
         SDDocumentImpl primaryDoc = primaryWsdl != null ? SDDocumentImpl.create(primaryWsdl,serviceName,portTypeName) : findPrimary(docList);
 
         EndpointAwareTube terminal;
-        WSDLPort wsdlPort = null;
+        WSDLPortImpl wsdlPort = null;
         AbstractSEIModelImpl seiModel = null;
         // create WSDL model
         if (primaryDoc != null) {
@@ -710,23 +709,23 @@ public class EndpointFactory {
      * @param container container in which this service is running
      * @return non-null wsdl port object
      */
-    private static @NotNull WSDLPort getWSDLPort(SDDocumentSource primaryWsdl, List<? extends SDDocumentSource> metadata,
+    private static @NotNull WSDLPortImpl getWSDLPort(SDDocumentSource primaryWsdl, List<? extends SDDocumentSource> metadata,
                                                      @NotNull QName serviceName, @NotNull QName portName, Container container,
                                                      EntityResolver resolver) {
         URL wsdlUrl = primaryWsdl.getSystemId();
         try {
             // TODO: delegate to another entity resolver
-            WSDLModel wsdlDoc = RuntimeWSDLParser.parse(
+            WSDLModelImpl wsdlDoc = RuntimeWSDLParser.parse(
                 new Parser(primaryWsdl), new EntityResolverImpl(metadata, resolver),
                     false, container, ServiceFinder.find(WSDLParserExtension.class).toArray());
             if(wsdlDoc.getServices().size() == 0) {
                 throw new ServerRtException(ServerMessages.localizableRUNTIME_PARSER_WSDL_NOSERVICE_IN_WSDLMODEL(wsdlUrl));
             }
-            WSDLService wsdlService = wsdlDoc.getService(serviceName);
+            WSDLServiceImpl wsdlService = wsdlDoc.getService(serviceName);
             if (wsdlService == null) {
                 throw new ServerRtException(ServerMessages.localizableRUNTIME_PARSER_WSDL_INCORRECTSERVICE(serviceName,wsdlUrl));
             }
-            WSDLPort wsdlPort = wsdlService.get(portName);
+            WSDLPortImpl wsdlPort = wsdlService.get(portName);
             if (wsdlPort == null) {
                 throw new ServerRtException(ServerMessages.localizableRUNTIME_PARSER_WSDL_INCORRECTSERVICEPORT(serviceName, portName, wsdlUrl));
             }

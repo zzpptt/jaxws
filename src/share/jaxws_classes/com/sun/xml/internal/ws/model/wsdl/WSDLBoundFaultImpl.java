@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,10 +26,10 @@
 package com.sun.xml.internal.ws.model.wsdl;
 
 import com.sun.istack.internal.NotNull;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLBoundFault;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLBoundOperation;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLFault;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLOperation;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLBoundFault;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLFault;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOperation;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLBoundOperation;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.namespace.QName;
@@ -37,12 +37,12 @@ import javax.xml.namespace.QName;
 /**
  * @author Vivek Pandey
  */
-public class WSDLBoundFaultImpl extends AbstractExtensibleImpl implements EditableWSDLBoundFault {
+public class WSDLBoundFaultImpl extends AbstractExtensibleImpl implements WSDLBoundFault {
     private final String name;
-    private EditableWSDLFault fault;
-    private EditableWSDLBoundOperation owner;
+    private WSDLFault fault;
+    private WSDLBoundOperationImpl owner;
 
-    public WSDLBoundFaultImpl(XMLStreamReader xsr, String name, EditableWSDLBoundOperation owner) {
+    public WSDLBoundFaultImpl(XMLStreamReader xsr, String name, WSDLBoundOperationImpl owner) {
         super(xsr);
         this.name = name;
         this.owner = owner;
@@ -61,20 +61,20 @@ public class WSDLBoundFaultImpl extends AbstractExtensibleImpl implements Editab
         return null;
     }
 
-    public EditableWSDLFault getFault() {
+    public WSDLFault getFault() {
         return fault;
     }
 
     @NotNull
-    public EditableWSDLBoundOperation getBoundOperation() {
+    public WSDLBoundOperation getBoundOperation() {
         return owner;
     }
 
-    public void freeze(EditableWSDLBoundOperation root) {
+    void freeze(WSDLBoundOperationImpl root) {
         assert root != null;
-        EditableWSDLOperation op = root.getOperation();
+        WSDLOperation op = root.getOperation();
         if (op != null) {
-            for (EditableWSDLFault f : op.getFaults()) {
+            for (WSDLFault f : op.getFaults()) {
                 if (f.getName().equals(name)) {
                     this.fault = f;
                     break;

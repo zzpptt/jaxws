@@ -102,7 +102,7 @@ final class ActionBasedOperationFinder extends WSDLOperationFinder {
             }
         } else {
             for (WSDLBoundOperation wsdlOp : wsdlModel.getBinding().getBindingOperations()) {
-                QName payloadName = wsdlOp.getRequestPayloadName();
+                QName payloadName = wsdlOp.getReqPayloadName();
                 if (payloadName == null)
                     payloadName = EMPTY_PAYLOAD;
                 String action = wsdlOp.getOperation().getInput().getAction();

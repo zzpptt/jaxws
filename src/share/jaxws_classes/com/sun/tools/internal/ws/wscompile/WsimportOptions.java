@@ -774,10 +774,4 @@ public class WsimportOptions extends Options {
                         is.setSystemId(systemId);
                 }
     }
-
-    @Override
-    protected void disableXmlSecurity() {
-        super.disableXmlSecurity();
-        schemaCompiler.getOptions().disableXmlSecurity = true;
-    }
 }

@@ -89,8 +89,6 @@ import com.sun.xml.internal.ws.util.Pool;
  */
 public class HttpAdapter extends Adapter<HttpAdapter.HttpToolkit> {
 
-    private static final Logger LOGGER = Logger.getLogger(HttpAdapter.class.getName());
-
     /**
      * {@link com.sun.xml.internal.ws.api.server.SDDocument}s keyed by the query string like "?abc".
      * Used for serving documents via HTTP GET.
@@ -854,14 +852,7 @@ public class HttpAdapter extends Adapter<HttpAdapter.HttpToolkit> {
                 }
             }
         }
-        if (buf.size() > dump_threshold) {
-            byte[] b = buf.getRawData();
-            baos.write(b, 0, dump_threshold);
-            pw.println();
-            pw.println(WsservletMessages.MESSAGE_TOO_LONG(HttpAdapter.class.getName() + ".dumpTreshold"));
-        } else {
-            buf.writeTo(baos);
-        }
+        buf.writeTo(baos);
         pw.println("--------------------");
 
         String msg = baos.toString();
@@ -955,8 +946,6 @@ public class HttpAdapter extends Adapter<HttpAdapter.HttpToolkit> {
      */
     public static volatile boolean dump = false;
 
-    public static volatile int dump_threshold = 4096;
-
     public static volatile boolean publishStatusPage = true;
 
     public static synchronized void setPublishStatus(boolean publish) {
@@ -965,32 +954,19 @@ public class HttpAdapter extends Adapter<HttpAdapter.HttpToolkit> {
 
     static {
         try {
-            dump = Boolean.getBoolean(HttpAdapter.class.getName() + ".dump");
-        } catch (SecurityException se) {
-            if (LOGGER.isLoggable(Level.CONFIG)) {
-                LOGGER.log(Level.CONFIG, "Cannot read ''{0}'' property, using defaults.",
-                        new Object[] {HttpAdapter.class.getName() + ".dump"});
-            }
+            dump = Boolean.getBoolean(HttpAdapter.class.getName()+".dump");
+        } catch( Throwable t ) {
+            // OK to ignore this
         }
         try {
-            dump_threshold = Integer.getInteger(HttpAdapter.class.getName() + ".dumpTreshold", 4096);
-        } catch (SecurityException se) {
-            if (LOGGER.isLoggable(Level.CONFIG)) {
-                LOGGER.log(Level.CONFIG, "Cannot read ''{0}'' property, using defaults.",
-                        new Object[] {HttpAdapter.class.getName() + ".dumpTreshold"});
-            }
-        }
-        try {
-            setPublishStatus(Boolean.getBoolean(HttpAdapter.class.getName() + ".publishStatusPage"));
-        } catch (SecurityException se) {
-            if (LOGGER.isLoggable(Level.CONFIG)) {
-                LOGGER.log(Level.CONFIG, "Cannot read ''{0}'' property, using defaults.",
-                        new Object[] {HttpAdapter.class.getName() + ".publishStatusPage"});
-            }
+            setPublishStatus(System.getProperty(HttpAdapter.class.getName()+".publishStatusPage").equals("true"));
+        } catch( Throwable t ) {
+            // OK to ignore this
         }
     }
 
     public static void setDump(boolean dumpMessages) {
         HttpAdapter.dump = dumpMessages;
     }
+    private static final Logger LOGGER = Logger.getLogger(HttpAdapter.class.getName());
 }

@@ -57,7 +57,7 @@ public class TypeConstraintException extends java.lang.RuntimeException {
      * Exception reference
      *
      */
-    private volatile Throwable linkedException;
+    private Throwable linkedException;
 
 
     /**
@@ -141,7 +141,7 @@ public class TypeConstraintException extends java.lang.RuntimeException {
      *                  indicates that the linked exception does not exist or
      *                  is unknown).
      */
-    public void setLinkedException( Throwable exception ) {
+    public synchronized void setLinkedException( Throwable exception ) {
         this.linkedException = exception;
     }
 

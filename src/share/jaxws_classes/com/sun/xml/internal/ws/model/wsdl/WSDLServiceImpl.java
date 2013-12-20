@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -29,13 +29,9 @@ import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLPort;
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLService;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLModel;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLPort;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLService;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -44,20 +40,20 @@ import java.util.Map;
  *
  * @author Vivek Pandey
  */
-public final class WSDLServiceImpl extends AbstractExtensibleImpl implements EditableWSDLService {
+public final class WSDLServiceImpl extends AbstractExtensibleImpl implements WSDLService {
     private final QName name;
-    private final Map<QName, EditableWSDLPort> ports;
-    private final EditableWSDLModel parent;
+    private final Map<QName, WSDLPortImpl> ports;
+    private final WSDLModelImpl parent;
 
-    public WSDLServiceImpl(XMLStreamReader xsr, EditableWSDLModel parent, QName name) {
+    public WSDLServiceImpl(XMLStreamReader xsr,WSDLModelImpl parent, QName name) {
         super(xsr);
         this.parent = parent;
         this.name = name;
-        ports = new LinkedHashMap<QName, EditableWSDLPort>();
+        ports = new LinkedHashMap<QName,WSDLPortImpl>();
     }
 
     public @NotNull
-    EditableWSDLModel getParent() {
+    WSDLModelImpl getParent() {
         return parent;
     }
 
@@ -65,18 +61,18 @@ public final class WSDLServiceImpl extends AbstractExtensibleImpl implements Edi
         return name;
     }
 
-    public EditableWSDLPort get(QName portName) {
+    public WSDLPortImpl get(QName portName) {
         return ports.get(portName);
     }
 
-    public EditableWSDLPort getFirstPort() {
+    public WSDLPort getFirstPort() {
         if(ports.isEmpty())
             return null;
         else
             return ports.values().iterator().next();
     }
 
-    public Iterable<EditableWSDLPort> getPorts(){
+    public Iterable<WSDLPortImpl> getPorts(){
         return ports.values();
     }
 
@@ -84,8 +80,8 @@ public final class WSDLServiceImpl extends AbstractExtensibleImpl implements Edi
     * gets the first port in this service which matches the portType
     */
     public @Nullable
-    EditableWSDLPort getMatchingPort(QName portTypeName){
-        for(EditableWSDLPort port : getPorts()){
+    WSDLPortImpl getMatchingPort(QName portTypeName){
+        for(WSDLPortImpl port : getPorts()){
             QName ptName = port.getBinding().getPortTypeName();
             assert (ptName != null);
             if(ptName.equals(portTypeName))
@@ -101,14 +97,14 @@ public final class WSDLServiceImpl extends AbstractExtensibleImpl implements Edi
      * @param port     Must be non-null
      * @throws NullPointerException if either opName or ptOp is null
      */
-    public void put(QName portName, EditableWSDLPort port) {
+    public void put(QName portName, WSDLPortImpl port) {
         if (portName == null || port == null)
             throw new NullPointerException();
         ports.put(portName, port);
     }
 
-    public void freeze(EditableWSDLModel root) {
-        for (EditableWSDLPort port : ports.values()) {
+    void freeze(WSDLModelImpl root) {
+        for (WSDLPortImpl port : ports.values()) {
             port.freeze(root);
         }
     }

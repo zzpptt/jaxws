@@ -88,9 +88,9 @@ public class ExternalMetadataFeature extends WebServiceFeature {
         return ID;
     }
 
-    public MetadataReader getMetadataReader(ClassLoader classLoader, boolean disableXmlSecurity) {
+    public MetadataReader getMetadataReader(ClassLoader classLoader, boolean disableSecureXmlProcessing) {
         if (reader != null && enabled) return reader;
-        return enabled ? new ExternalMetadataReader(files, resourceNames, classLoader, true, disableXmlSecurity) : null;
+        return enabled ? new ExternalMetadataReader(files, resourceNames, classLoader, true, disableSecureXmlProcessing) : null;
     }
 
     @Override

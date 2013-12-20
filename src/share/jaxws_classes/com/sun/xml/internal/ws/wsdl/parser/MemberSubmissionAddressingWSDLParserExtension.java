@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,8 +27,13 @@ package com.sun.xml.internal.ws.wsdl.parser;
 
 import com.sun.xml.internal.ws.api.addressing.AddressingVersion;
 import com.sun.xml.internal.ws.developer.MemberSubmissionAddressingFeature;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLBoundOperation;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLBoundPortType;
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLFeaturedObject;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.*;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOperation;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLPort;
+import com.sun.xml.internal.ws.model.wsdl.WSDLBoundPortTypeImpl;
+import com.sun.xml.internal.ws.model.wsdl.WSDLOperationImpl;
 import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil;
 
 import javax.xml.namespace.QName;
@@ -41,12 +46,12 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class MemberSubmissionAddressingWSDLParserExtension extends W3CAddressingWSDLParserExtension {
     @Override
-    public boolean bindingElements(EditableWSDLBoundPortType binding, XMLStreamReader reader) {
+    public boolean bindingElements(WSDLBoundPortType binding, XMLStreamReader reader) {
         return addressibleElement(reader, binding);
     }
 
     @Override
-    public boolean portElements(EditableWSDLPort port, XMLStreamReader reader) {
+    public boolean portElements(WSDLPort port, XMLStreamReader reader) {
         return addressibleElement(reader, port);
     }
 
@@ -63,12 +68,12 @@ public class MemberSubmissionAddressingWSDLParserExtension extends W3CAddressing
     }
 
     @Override
-    public boolean bindingOperationElements(EditableWSDLBoundOperation operation, XMLStreamReader reader) {
+    public boolean bindingOperationElements(WSDLBoundOperation operation, XMLStreamReader reader) {
         return false;
     }
 
     @Override
-    protected void patchAnonymousDefault(EditableWSDLBoundPortType binding) {
+    protected void patchAnonymousDefault(WSDLBoundPortTypeImpl binding) {
     }
 
     @Override

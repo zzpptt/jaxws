@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,9 @@
 
 package com.sun.xml.internal.ws.wsdl.parser;
 
-import com.sun.xml.internal.ws.api.model.wsdl.editable.*;
+import com.sun.xml.internal.ws.api.model.wsdl.*;
+import com.sun.xml.internal.ws.model.wsdl.WSDLOperationImpl;
+import com.sun.xml.internal.ws.model.wsdl.WSDLBoundPortTypeImpl;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.namespace.QName;
 
@@ -41,22 +43,22 @@ public class W3CAddressingMetadataWSDLParserExtension extends W3CAddressingWSDLP
     String METADATA_WSDL_EXTN_NS = "http://www.w3.org/2007/05/addressing/metadata";
     QName METADATA_WSDL_ACTION_TAG = new QName(METADATA_WSDL_EXTN_NS, "Action", "wsam");
     @Override
-    public boolean bindingElements(EditableWSDLBoundPortType binding, XMLStreamReader reader) {
+    public boolean bindingElements(WSDLBoundPortType binding, XMLStreamReader reader) {
         return false;
     }
 
     @Override
-    public boolean portElements(EditableWSDLPort port, XMLStreamReader reader) {
+    public boolean portElements(WSDLPort port, XMLStreamReader reader) {
         return false;
     }
 
     @Override
-    public boolean bindingOperationElements(EditableWSDLBoundOperation operation, XMLStreamReader reader) {
+    public boolean bindingOperationElements(WSDLBoundOperation operation, XMLStreamReader reader) {
         return false;
     }
 
     @Override
-    protected void patchAnonymousDefault(EditableWSDLBoundPortType binding) {
+    protected void patchAnonymousDefault(WSDLBoundPortTypeImpl binding) {
     }
 
     @Override

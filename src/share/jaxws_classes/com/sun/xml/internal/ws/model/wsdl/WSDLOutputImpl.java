@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,10 +25,9 @@
 
 package com.sun.xml.internal.ws.model.wsdl;
 
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLMessage;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLModel;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLOperation;
-import com.sun.xml.internal.ws.api.model.wsdl.editable.EditableWSDLOutput;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLMessage;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOperation;
 import com.sun.istack.internal.NotNull;
 
 import javax.xml.namespace.QName;
@@ -37,15 +36,14 @@ import javax.xml.stream.XMLStreamReader;
 /**
  * @author Vivek Pandey
  */
-public final class WSDLOutputImpl extends AbstractExtensibleImpl implements EditableWSDLOutput {
+public final class WSDLOutputImpl extends AbstractExtensibleImpl implements WSDLOutput {
     private String name;
     private QName messageName;
-    private EditableWSDLOperation operation;
-    private EditableWSDLMessage message;
+    private WSDLOperationImpl operation;
+    private WSDLMessageImpl message;
     private String action;
     private boolean defaultAction = true;
-
-    public WSDLOutputImpl(XMLStreamReader xsr,String name, QName messageName, EditableWSDLOperation operation) {
+    public WSDLOutputImpl(XMLStreamReader xsr,String name, QName messageName, WSDLOperationImpl operation) {
         super(xsr);
         this.name = name;
         this.messageName = messageName;
@@ -56,7 +54,7 @@ public final class WSDLOutputImpl extends AbstractExtensibleImpl implements Edit
         return (name == null)?operation.getName().getLocalPart()+"Response":name;
     }
 
-    public EditableWSDLMessage getMessage() {
+    public WSDLMessage getMessage() {
         return message;
     }
 
@@ -73,7 +71,7 @@ public final class WSDLOutputImpl extends AbstractExtensibleImpl implements Edit
     }
 
     @NotNull
-    public EditableWSDLOperation getOperation() {
+    public WSDLOperation getOperation() {
         return operation;
     }
 
@@ -86,7 +84,7 @@ public final class WSDLOutputImpl extends AbstractExtensibleImpl implements Edit
         this.action = action;
     }
 
-    public void freeze(EditableWSDLModel root) {
+    void freeze(WSDLModelImpl root) {
         message = root.getMessage(messageName);
     }
 }

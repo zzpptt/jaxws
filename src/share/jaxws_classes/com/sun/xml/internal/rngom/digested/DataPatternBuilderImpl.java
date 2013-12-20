@@ -23,7 +23,7 @@
  * questions.
  */
 /*
- * Copyright (C) 2004-2012
+ * Copyright (C) 2004-2011
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -82,9 +82,8 @@ final class DataPatternBuilderImpl implements DataPatternBuilder {
 
     public ParsedPattern makePattern(ParsedPattern except, Location loc, Annotations anno) throws BuildException {
         p.except = (DPattern)except;
-        if (anno!=null) {
+        if(anno!=null)
             p.annotation = ((Annotation)anno).getResult();
-        }
         return p;
     }
 }

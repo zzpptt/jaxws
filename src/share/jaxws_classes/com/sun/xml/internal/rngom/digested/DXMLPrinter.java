@@ -110,11 +110,7 @@ public class DXMLPrinter {
             visitor.on(grammar);
             visitor.endDocument();
         } catch (XMLWriterException e) {
-            if (e.getCause() instanceof XMLStreamException) {
-                throw (XMLStreamException) e.getCause();
-            } else {
-                throw new XMLStreamException(e);
-            }
+            throw (XMLStreamException) e.getCause();
         }
     }
 
@@ -127,11 +123,7 @@ public class DXMLPrinter {
         try {
             pattern.accept(visitor);
         } catch (XMLWriterException e) {
-            if (e.getCause() instanceof XMLStreamException) {
-                throw (XMLStreamException) e.getCause();
-            } else {
-                throw new XMLStreamException(e);
-            }
+            throw (XMLStreamException) e.getCause();
         }
     }
 
@@ -144,11 +136,7 @@ public class DXMLPrinter {
         try {
             nc.accept(ncVisitor);
         } catch (XMLWriterException e) {
-            if (e.getCause() instanceof XMLStreamException) {
-                throw (XMLStreamException) e.getCause();
-            } else {
-                throw new XMLStreamException(e);
-            }
+            throw (XMLStreamException) e.getCause();
         }
     }
 
